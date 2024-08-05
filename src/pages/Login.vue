@@ -63,8 +63,8 @@ import { useAdminStore } from "@/stores/adminStore";
 const adminStore = useAdminStore();
 
 const data = ref({
-  login: "login",
-  password: "1234578910",
+  login: "login22",
+  password: "login",
 });
 
 const showPassword = ref(false);

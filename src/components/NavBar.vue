@@ -11,8 +11,8 @@
         class="flex items-center duration-300"
         :class="
           store.isOpen
-            ? 'xl:ml-[7%]  md:ml-[11%] sm:ml-[15%]'
-            : 'md:ml-[18%]  sm:ml-[22%]'
+            ? 'xl:ml-[7%] md:ml-[11%] sm:ml-[15%]'
+            : 'md:ml-[18%] sm:ml-[22%]'
         "
       >
         <label class="flex items-center cursor-pointer">
@@ -56,12 +56,17 @@
         <!-- Dropdown menu -->
         <div
           v-if="isDropdownOpen"
-          class="absolute right-0 top-10 mt-2 w-48 bg-white border border-gray-300 dark:bg-gray-800 dark:border-gray-600 rounded shadow-lg"
+          :class="[
+            'absolute right-0 mt-2 top-10 rounded-lg px-1 pr-10 bg-white border border-gray-300 dark:bg-gray-800 dark:border-gray-600 shadow-lg',
+            isDropdownOpen
+              ? 'opacity-100 -translate-x-1  transition-transform duration-300'
+              : 'opacity-0 translate-x-0 transition-transform duration-300',
+          ]"
         >
           <ul class="py-2">
             <button
               @click="router.push('/profile')"
-              class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+              class="flex items-center px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
             >
               <i
                 class="fi fi-ss-user w-5 h-5 mr-2 text-gray-600 dark:text-gray-300"
@@ -70,7 +75,7 @@
             </button>
             <button
               @click="logout"
-              class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+              class="flex items-center px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
             >
               <i
                 class="fi fi-br-sign-out-alt w-5 h-5 mr-2 text-gray-600 dark:text-gray-300"
@@ -95,7 +100,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from "vue";
 import { useFuncStore } from "../stores/funcStore";
@@ -105,8 +109,8 @@ const isDropdownOpen = ref(false);
 const isDarkMode = ref(false);
 const router = useRouter();
 const store = useFuncStore();
-// Load the dark mode setting from localStorage
 
+// Load the dark mode setting from localStorage
 onMounted(() => {
   const darkModeSetting = localStorage.getItem("isDarkMode");
   isDarkMode.value = darkModeSetting === "true";
@@ -132,7 +136,3 @@ const logout = () => {
   router.push("/login");
 };
 </script>
-
-<style scoped>
-/* Add any additional styles for the dropdown menu and dark mode if necessary */
-</style>

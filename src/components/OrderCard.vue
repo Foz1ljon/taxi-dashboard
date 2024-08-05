@@ -1,76 +1,60 @@
 <template>
   <div
-    class="relative bg-white shadow-sm rounded-lg p-4 mb-6 dark:bg-gray-800 dark:shadow-gray-700 border border-gray-200 dark:border-gray-600 w-full max-w-sm mx-auto"
+    class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 h-[400px]"
   >
-    <!-- Actions -->
-    <div class="absolute top-3 right-3">
+    <div class="flex justify-between items-start mb-4">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        Order #{{ order.id }}
+      </h2>
       <button
         @click="handleDelete"
-        class="text-red-700 block px-3 py-2 text-xl"
+        class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
         title="Delete"
       >
-        <span class="text-xl">🗑️</span>
+        🗑️
       </button>
     </div>
 
-    <div class="grid grid-cols-1 gap-6">
-      <!-- Order Details -->
-      <div class="space-y-4">
-        <h2
-          class="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100"
-        >
-          Order ID: {{ order.id }}
-        </h2>
-        <div class="text-gray-700 dark:text-gray-300 text-sm md:text-base">
-          <p><strong>About:</strong> {{ order.description || "N/A" }}</p>
-          <p><strong>Date:</strong> {{ formatDate(order.date) || "N/A" }}</p>
-          <p>
-            <strong>Location Start:</strong> {{ order.location_start || "N/A" }}
-          </p>
-          <p><strong>From:</strong> {{ order.fromDistrict?.name || "N/A" }}</p>
-          <p><strong>To:</strong> {{ order.toDistrict?.name || "N/A" }}</p>
-          <p><strong>Price:</strong> {{ order.price || "N/A" }} UZS</p>
-          <p><strong>Distance:</strong> {{ order.distance || "N/A" }}</p>
-          <p><strong>Duration:</strong> {{ order.duration || "N/A" }}</p>
-          <p class="flex items-center gap-2">
-            <strong>Status:</strong>
-            <span
-              :class="{
-                'bg-green-100 text-green-800': order.status === 'Completed',
-                'bg-yellow-100 text-yellow-800': order.status === 'In Progress',
-                'bg-red-100 text-red-800': order.status === 'Cancelled',
-              }"
-              class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
-            >
-              {{ order.status || "N/A" }}
-            </span>
-          </p>
-        </div>
+    <div class="space-y-4 text-sm">
+      <div class="text-gray-700 dark:text-gray-300">
+        <p>{{ order.description || "No description" }}</p>
+        <p>{{ formatDate(order.date) }}</p>
+        <p>{{ order.fromDistrict?.name }} → {{ order.toDistrict?.name }}</p>
+        <p>
+          {{ order.price }} UZS | {{ order.distance }} | {{ order.duration }}
+        </p>
       </div>
 
-      <!-- Driver Details -->
-      <DriverCard :driver="order.driver" class="w-full" />
-
-      <!-- Client Details -->
-      <div
-        class="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg border border-gray-200 dark:border-gray-600"
-      >
-        <h3
-          class="text-md md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2"
+      <div class="flex items-center justify-between">
+        <span
+          :class="{
+            'bg-green-100 text-green-800': order.status === 'Arrived',
+            'bg-yellow-100 text-yellow-800': order.status === 'In Progress',
+            'bg-red-100 text-red-800': order.status === 'Cancelled',
+            'bg-gray-100 text-gray-800': !order.status,
+          }"
+          class="px-2 py-1 rounded-full text-xs font-medium"
         >
+          {{ order.status || "N/A" }}
+        </span>
+      </div>
+
+      <DriverCard :driver="order.driver" />
+
+      <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Client
         </h3>
-        <div class="space-y-1 text-sm md:text-base">
-          <p><strong>Name:</strong> {{ order.client?.name || "N/A" }}</p>
-          <p><strong>Phone:</strong> {{ order.client?.phone || "N/A" }}</p>
-        </div>
+        <p class="text-gray-700 dark:text-gray-300">
+          {{ order.client?.name || "N/A" }} | {{ order.client?.phone || "N/A" }}
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { defineProps } from "vue";
 import DriverCard from "@/components/DriverCard.vue";
 import { usetaxiOrderStore } from "../stores/taxiorderStore";
 
@@ -81,20 +65,13 @@ const props = defineProps({
   },
 });
 
-const dropdownOpen = ref(false);
-
 const handleDelete = () => {
-  console.log(`Delete order with id: ${props.order.id}`);
   usetaxiOrderStore().deletetaxiOrder(props.order.id);
 };
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
+  const options = { year: "numeric", month: "long", day: "numeric" };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 </script>

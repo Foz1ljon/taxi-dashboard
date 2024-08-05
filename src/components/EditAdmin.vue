@@ -10,11 +10,11 @@
         <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
           Edit Profile
         </h2>
-        <form @submit.prevent="handleSubmit(formData.id)">
+        <form @submit.prevent="handleSubmit">
           <div class="mb-4">
-            <label for="login" class="block text-gray-700 dark:text-gray-300"
-              >Login</label
-            >
+            <label for="login" class="block text-gray-700 dark:text-gray-300">
+              Login
+            </label>
             <input
               v-model="formData.login"
               id="login"
@@ -23,9 +23,9 @@
             />
           </div>
           <div class="mb-4">
-            <label for="tg_link" class="block text-gray-700 dark:text-gray-300"
-              >Telegram Link</label
-            >
+            <label for="tg_link" class="block text-gray-700 dark:text-gray-300">
+              Telegram Link
+            </label>
             <input
               v-model="formData.tg_link"
               id="tg_link"
@@ -34,9 +34,9 @@
             />
           </div>
           <div class="mb-4">
-            <label for="status" class="block text-gray-700 dark:text-gray-300"
-              >Status</label
-            >
+            <label for="status" class="block text-gray-700 dark:text-gray-300">
+              Status
+            </label>
             <select
               v-model="formData.is_active"
               id="status"
@@ -68,47 +68,54 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useAdminStore } from "@/stores/adminStore";
 
 const props = defineProps({
   isOpen: Boolean,
   onClose: Function,
+  id: Number,
 });
+
+const emit = defineEmits(["close"]);
 
 const adminStore = useAdminStore();
-
 const formData = ref({
-  login: adminStore.profile.login || "",
-  tg_link: adminStore.profile.tg_link || "",
-  is_active: adminStore.profile.is_active || false,
+  login: "",
+  tg_link: "",
+  is_active: false,
 });
 
-watch(
-  () => adminStore.profile,
-  (newProfile) => {
-    formData.value = {
-      login: newProfile.login || "",
-      tg_link: newProfile.tg_link || "",
-      is_active: newProfile.is_active || false,
-    };
+const handleSubmit = () => {
+  if (props.id) {
+    adminStore
+      .updateAdmin(props.id, {
+        login: formData.value.login,
+        tg_link: formData.value.tg_link,
+        is_active: formData.value.is_active,
+      })
+      .then(() => handleClose());
   }
-);
-
-const handleSubmit = (id) => {
-  adminStore.updateAdmin(adminStore.profile.id, {
-    login: formData.value.login,
-    tg_link: formData.value.tg_link,
-    is_active: formData.value.is_active,
-  });
-  handleClose();
 };
 
 const handleClose = () => {
-  if (props.onClose) {
-    props.onClose();
-  }
+  emit("close");
 };
+
+watch(
+  () => props.id,
+  (newId) => {
+    if (newId) {
+      adminStore.getAdminById(newId).then(() => {
+        formData.value = {
+          login: adminStore.profile.login || "",
+          tg_link: adminStore.profile.tg_link || "",
+          is_active: adminStore.profile.is_active || false,
+        };
+      });
+    }
+  }
+);
 </script>
 
 <style scoped>

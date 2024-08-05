@@ -1,6 +1,17 @@
 <template>
   <div class="p-6 bg-white dark:bg-gray-900">
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto h-screen">
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          Admin List
+        </h1>
+        <button
+          @click="openCreateModal"
+          class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500"
+        >
+          Create Admin
+        </button>
+      </div>
       <table
         class="min-w-full divide-y divide-gray-200 bg-white shadow-md rounded-lg dark:bg-gray-800 dark:divide-gray-700"
       >
@@ -53,7 +64,7 @@
                   'text-green-500': admin.is_active,
                   'text-red-500': !admin.is_active,
                 }"
-                class="text-white px-1 py-1 rounded dark:text-white"
+                class="px-1 py-1 rounded"
               >
                 {{ admin.is_active ? "Active" : "Inactive" }}
               </p>
@@ -67,7 +78,7 @@
               class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2"
             >
               <button
-                @click="editAdmin(admin)"
+                @click="openEditModal(admin)"
                 class="text-blue-500 hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-400"
               >
                 <i class="fi fi-sr-edit"></i>
@@ -80,24 +91,27 @@
                 <i class="fi fi-sr-trash"></i>
                 <!-- Delete icon -->
               </button>
-              <button
-                @click="toggleActive(admin)"
-                class="text-green-500 hover:text-green-700 dark:text-green-300 dark:hover:text-green-400"
-              >
-                <i class="fi fi-ss-check-circle"></i>
-                <!-- Toggle icon -->
-              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <EditProfileModal
+      :id="selectedAdminId"
+      :isOpen="isEditModalOpen"
+      :onClose="closeEditModal"
+    />
+
+    <CreateAdminModal :visible="isCreateModalOpen" @close="closeCreateModal" />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
-import { useAdminStore } from "../../stores/adminStore";
+import { onMounted, ref } from "vue";
+import { useAdminStore } from "@/stores/adminStore";
+import EditProfileModal from "@/components/EditAdmin.vue";
+import CreateAdminModal from "@/components/createAdmin.vue";
 
 const adminStore = useAdminStore();
 
@@ -105,7 +119,28 @@ onMounted(() => {
   adminStore.fetchAdmins();
 });
 
-// Utility function to format dates
+const isEditModalOpen = ref(false);
+const isCreateModalOpen = ref(false);
+const selectedAdminId = ref(null);
+
+const openEditModal = (admin) => {
+  selectedAdminId.value = admin.id;
+  isEditModalOpen.value = true;
+};
+
+const closeEditModal = () => {
+  isEditModalOpen.value = false;
+  selectedAdminId.value = null;
+};
+
+const openCreateModal = () => {
+  isCreateModalOpen.value = true;
+};
+
+const closeCreateModal = () => {
+  isCreateModalOpen.value = false;
+};
+
 const formatDate = (dateString) => {
   const options = {
     year: "numeric",
@@ -117,20 +152,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-// Method to handle admin activation/deactivation
-const toggleActive = (admin) => {
-  adminStore.toggleAdminStatus(admin.id);
-};
-
-// Method to handle editing an admin
-const editAdmin = (admin) => {
-  console.log("Edit admin:", admin);
-};
-
-// Method to handle deleting an admin
 const deleteAdmin = (adminId) => {
-  if (confirm("Are you sure you want to delete this admin?")) {
-    adminStore.deleteAdmin(adminId);
-  }
+  adminStore.deleteAdmin(adminId);
 };
 </script>

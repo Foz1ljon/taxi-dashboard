@@ -42,9 +42,15 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
-          path: "/orders",
+          path: "/taxi-orders",
           name: "order-list",
           component: () => import("@/views/orders/order-list.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "/delivery-orders",
+          name: "delivery-list",
+          component: () => import("@/views/orders/delivery-order.vue"),
           meta: { requiresAuth: true },
         },
       ],

@@ -29,7 +29,7 @@
         :class="
           route.path == item.to
             ? ''
-            : 'hover:bg-gray-400 hover:shadow-lg dark:hover:bg-gray-700'
+            : 'hover:bg-gray-400 hover:shadow-lg dark:hover:bg-gray-700 hover:animate-pulse'
         "
         v-for="(item, i) in store.menu"
         :key="i"

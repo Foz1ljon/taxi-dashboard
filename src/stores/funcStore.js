@@ -20,7 +20,7 @@ export const useFuncStore = defineStore("func", {
       },
       {
         name: "Orders",
-        to: "/orders",
+        to: "/taxi-orders",
         icon: "fi fi-rs-taxi",
       },
       {

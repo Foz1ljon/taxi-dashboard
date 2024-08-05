@@ -60,17 +60,26 @@
     </div>
 
     <!-- Edit Profile Modal -->
-    <EditProfileModal :isOpen="isModalOpen" :onClose="closeModal" />
+    <EditProfileModal
+      :id="adminStore.profile.id"
+      :isOpen="isModalOpen"
+      :onClose="closeModal"
+    />
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from "vue";
 import { useAdminStore } from "@/stores/adminStore";
-import EditProfileModal from "@/components/EditAdmin.vue";
+import EditProfileModal from "@/components/EditAdmin.vue"; // Ensure correct component path
 
 const adminStore = useAdminStore();
 const isModalOpen = ref(false);
+
+// Retrieve ID from localStorage and handle potential issues
+const id = localStorage.getItem("id");
+if (!id) {
+  console.error("No ID found in localStorage");
+}
 
 const openModal = () => {
   isModalOpen.value = true;
@@ -80,8 +89,15 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
-onMounted(() => {
-  const id = localStorage.getItem("id");
-  adminStore.getAdminById(id);
+onMounted(async () => {
+  if (id) {
+    try {
+      await adminStore.getAdminById(id);
+    } catch (error) {
+      console.error("Error fetching admin data:", error);
+    }
+  } else {
+    console.error("ID is not available, cannot fetch admin data");
+  }
 });
 </script>
