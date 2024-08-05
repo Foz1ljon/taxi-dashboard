@@ -25,6 +25,7 @@ export const usetaxiOrderStore = defineStore("taxiOrder", {
       try {
         const response = await api.get(`/taxi-order`, this.setHeaders());
         this.taxiOrders = response.data; // Buyurtmalarni saqlash
+        console.log(response.data);
       } catch (error) {
         this.toast.error("Buyurtmalarni olishda xato.");
         console.error("Buyurtmalarni olish xatosi:", error);

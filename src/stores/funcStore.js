@@ -28,6 +28,11 @@ export const useFuncStore = defineStore("func", {
         to: "/delivery-orders",
         icon: "fi fi-rs-order-history",
       },
+      {
+        name: "Clients",
+        to: "/clients",
+        icon: "fi fi-sr-hr-group",
+      },
     ],
   }),
   actions: {

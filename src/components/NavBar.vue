@@ -10,7 +10,9 @@
       <div
         class="flex items-center duration-300"
         :class="
-          store.isOpen ? 'xl:ml-[7%]  md:ml-[11%] sm:ml-[15%]' : 'md:ml-[18%]  sm:ml-[22%]'
+          store.isOpen
+            ? 'xl:ml-[7%]  md:ml-[11%] sm:ml-[15%]'
+            : 'md:ml-[18%]  sm:ml-[22%]'
         "
       >
         <label class="flex items-center cursor-pointer">

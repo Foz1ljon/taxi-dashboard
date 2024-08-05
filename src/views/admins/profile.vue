@@ -24,6 +24,12 @@
         >
           {{ adminStore.profile.is_creator ? "Creator" : "Regular User" }}
         </p>
+        <button
+          @click="openModal"
+          class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500"
+        >
+          Edit Profile
+        </button>
       </div>
       <div class="mt-6">
         <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg space-y-2">
@@ -52,16 +58,30 @@
         </div>
       </div>
     </div>
+
+    <!-- Edit Profile Modal -->
+    <EditProfileModal :isOpen="isModalOpen" :onClose="closeModal" />
   </div>
 </template>
 
 <script setup>
-import { useAdminStore } from "../../stores/adminStore";
-import { onMounted } from "vue";
-const id = localStorage.getItem("id");
+import { ref, onMounted } from "vue";
+import { useAdminStore } from "@/stores/adminStore";
+import EditProfileModal from "@/components/EditAdmin.vue";
+
 const adminStore = useAdminStore();
+const isModalOpen = ref(false);
+
+const openModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
 
 onMounted(() => {
+  const id = localStorage.getItem("id");
   adminStore.getAdminById(id);
 });
 </script>

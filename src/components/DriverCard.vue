@@ -7,9 +7,9 @@
     </h3>
     <div class="flex sm:flex-row flex-col items-center gap-2">
       <img
-        v-if="driver.photo"
+        v-if="driver?.photo"
         class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-        :src="driver.photo"
+        :src="driver?.photo"
         alt="Driver Photo"
       />
       <div>

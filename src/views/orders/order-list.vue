@@ -45,7 +45,7 @@
 <script setup>
 import { onMounted } from "vue";
 import { usetaxiOrderStore } from "@/stores/taxiorderStore";
-import OrderCard from "@/components/OrderCard.vue"; // Import the OrderCard component
+import OrderCard from "@/components/OrderCard.vue";
 
 const store = usetaxiOrderStore();
 
@@ -53,7 +53,3 @@ onMounted(() => {
   store.fetchtaxiOrders();
 });
 </script>
-
-<style scoped>
-/* Additional custom styles for modern look and feel */
-</style>

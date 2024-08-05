@@ -2,16 +2,15 @@
   <div
     class="relative bg-white shadow-sm rounded-lg p-4 mb-6 dark:bg-gray-800 dark:shadow-gray-700 border border-gray-200 dark:border-gray-600 w-full max-w-sm mx-auto"
   >
-    <!-- Dropdown Menu for Delete & Edit -->
+    <!-- Actions -->
     <div class="absolute top-3 right-3">
-      <div class="relative inline-block text-left">
-        <button
-          @click="handleDelete"
-          class="text-red-700 block px-3 py-2 text-xl"
-        >
-          <i class="fi fi-sr-trash"></i>
-        </button>
-      </div>
+      <button
+        @click="handleDelete"
+        class="text-red-700 block px-3 py-2 text-xl"
+        title="Delete"
+      >
+        <span class="text-xl">🗑️</span>
+      </button>
     </div>
 
     <div class="grid grid-cols-1 gap-6">
@@ -28,11 +27,8 @@
           <p>
             <strong>Location Start:</strong> {{ order.location_start || "N/A" }}
           </p>
-          <p>
-            <strong>From:</strong>
-            {{ order.fromDistrict.name || "N/A" }}
-          </p>
-          <p><strong>To:</strong> {{ order.toDistrict.name || "N/A" }}</p>
+          <p><strong>From:</strong> {{ order.fromDistrict?.name || "N/A" }}</p>
+          <p><strong>To:</strong> {{ order.toDistrict?.name || "N/A" }}</p>
           <p><strong>Price:</strong> {{ order.price || "N/A" }} UZS</p>
           <p><strong>Distance:</strong> {{ order.distance || "N/A" }}</p>
           <p><strong>Duration:</strong> {{ order.duration || "N/A" }}</p>
@@ -52,7 +48,7 @@
         </div>
       </div>
 
-      <!-- Use DriverCard Component -->
+      <!-- Driver Details -->
       <DriverCard :driver="order.driver" class="w-full" />
 
       <!-- Client Details -->
@@ -65,8 +61,8 @@
           Client
         </h3>
         <div class="space-y-1 text-sm md:text-base">
-          <p><strong>Name:</strong> {{ order.client.name || "N/A" }}</p>
-          <p><strong>Phone:</strong> {{ order.client.phone || "N/A" }}</p>
+          <p><strong>Name:</strong> {{ order.client?.name || "N/A" }}</p>
+          <p><strong>Phone:</strong> {{ order.client?.phone || "N/A" }}</p>
         </div>
       </div>
     </div>
@@ -76,6 +72,7 @@
 <script setup>
 import { ref } from "vue";
 import DriverCard from "@/components/DriverCard.vue";
+import { usetaxiOrderStore } from "../stores/taxiorderStore";
 
 const props = defineProps({
   order: {
@@ -87,16 +84,10 @@ const props = defineProps({
 const dropdownOpen = ref(false);
 
 const handleDelete = () => {
-  // Implement the delete logic here
   console.log(`Delete order with id: ${props.order.id}`);
-  dropdownOpen.value = false; // Close dropdown after action
+  usetaxiOrderStore().deletetaxiOrder(props.order.id);
 };
 
-const toggleDropdown = () => {
-  dropdownOpen.value = !dropdownOpen.value;
-};
-
-// Utility function to format dates
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const options = {
