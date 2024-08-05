@@ -100,8 +100,39 @@
             </p>
           </div>
         </div>
+
         <div class="mt-4 flex space-x-4">
-          <!-- Activate/Deactivate Button -->
+          <!-- Add balance -->
+          <div class="relative group">
+            <button
+              @click="openBalanceModal(driver.id, 'add')"
+              class="relative flex items-center justify-center text-lg p-2 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <i class="fi fi-sr-shopping-cart-add"></i>
+              <div
+                class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              >
+                Add Balance
+              </div>
+            </button>
+          </div>
+
+          <!-- Remove balance -->
+          <div class="relative group">
+            <button
+              @click="openBalanceModal(driver.id, 'remove')"
+              class="relative flex items-center justify-center text-lg p-2 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <i class="fi fi-sr-remove-user"></i>
+              <div
+                class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              >
+                Remove Balance
+              </div>
+            </button>
+          </div>
+
+          <!-- Toggle active status -->
           <div class="relative group">
             <button
               @click="toggleActive(driver)"
@@ -118,7 +149,6 @@
                     : 'fi fi-rr-check-circle'
                 "
               ></i>
-              <!-- Tooltip -->
               <div
                 class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               >
@@ -126,6 +156,7 @@
               </div>
             </button>
           </div>
+
           <!-- Delete Button -->
           <div class="relative group">
             <button
@@ -133,7 +164,6 @@
               class="relative flex items-center justify-center text-lg p-2 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <i class="fi fi-rr-trash"></i>
-              <!-- Tooltip -->
               <div
                 class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               >
@@ -146,27 +176,72 @@
     </div>
 
     <!-- Modal for viewing Prava document -->
-    <div
-      v-if="showModal"
-      class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50"
-      @click.self="closeModal"
-    >
+    <transition name="fade">
       <div
-        class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-3xl w-full relative"
+        v-if="showModal"
+        class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50"
+        @click.self="closeModal"
       >
-        <button
-          @click="closeModal"
-          class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+        <div
+          class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-3xl w-full relative"
         >
-          <i class="fi fi-rr-close text-xl"></i>
-        </button>
-        <iframe
-          :src="modalDocumentUrl"
-          class="w-full h-96"
-          frameborder="0"
-        ></iframe>
+          <button
+            @click="closeModal"
+            class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+          >
+            <i class="fi fi-rr-close text-xl"></i>
+          </button>
+          <iframe
+            :src="modalDocumentUrl"
+            class="w-full h-96"
+            frameborder="0"
+          ></iframe>
+        </div>
       </div>
-    </div>
+    </transition>
+
+    <!-- Modal for balance actions -->
+    <transition name="fade">
+      <div
+        v-if="showBalanceModal"
+        class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50"
+        @click.self="closeBalanceModal"
+      >
+        <div
+          class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-md w-full relative"
+        >
+          <button
+            @click="closeBalanceModal"
+            class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+          >
+            <i class="fi fi-rr-close text-xl"></i>
+          </button>
+          <h2 class="text-lg font-semibold mb-4">
+            {{ balanceAction === "add" ? "Add Balance" : "Remove Balance" }}
+          </h2>
+          <input
+            v-model.number="balanceAmount"
+            type="number"
+            placeholder="Enter amount"
+            class="w-full border border-gray-300 rounded p-2 mb-4"
+          />
+          <div class="flex justify-end space-x-4">
+            <button
+              @click="submitBalanceAction"
+              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Submit
+            </button>
+            <button
+              @click="closeBalanceModal"
+              class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -176,14 +251,16 @@ import { useDriverStore } from "../../stores/driverStore";
 
 const driverStore = useDriverStore();
 const showModal = ref(false);
+const showBalanceModal = ref(false);
 const modalDocumentUrl = ref("");
-const loadingState = ref({ driverId: null, action: "" }); // Track loading state
+const balanceAction = ref(""); // 'add' or 'remove'
+const balanceAmount = ref(0);
+const loadingState = ref({ driverId: null, action: "" });
 
 onMounted(() => {
   driverStore.fetchDrivers();
 });
 
-// Utility function to format dates
 const formatDate = (dateString) => {
   if (!dateString) return "Not Available";
   const options = {
@@ -196,7 +273,6 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-// Method to handle driver activation/deactivation
 const toggleActive = async (driver) => {
   loadingState.value = { driverId: driver.id, action: "toggle" };
   try {
@@ -207,7 +283,6 @@ const toggleActive = async (driver) => {
   }
 };
 
-// Method to handle deleting a driver
 const deleteDriver = async (driverId) => {
   if (confirm("Are you sure you want to delete this driver?")) {
     loadingState.value = { driverId, action: "delete" };
@@ -219,18 +294,47 @@ const deleteDriver = async (driverId) => {
   }
 };
 
-// Method to open the modal
 const openModal = (url) => {
   modalDocumentUrl.value = url;
   showModal.value = true;
 };
 
-// Method to close the modal
 const closeModal = () => {
   showModal.value = false;
 };
-</script>
 
-<style scoped>
-/* Additional custom styles */
-</style>
+const openBalanceModal = (driverId, action) => {
+  balanceAction.value = action;
+  balanceAmount.value = 0;
+  driverStore.selectedDriverId = driverId; // Set the selected driver ID
+  showBalanceModal.value = true;
+};
+
+const closeBalanceModal = () => {
+  showBalanceModal.value = false;
+};
+
+const submitBalanceAction = async () => {
+  if (balanceAmount.value <= 0) {
+    alert("Please enter a valid amount.");
+    return;
+  }
+
+  const driverId = driverStore.selectedDriverId; // Get the selected driver ID
+  loadingState.value = { driverId, action: balanceAction.value };
+
+  try {
+    if (balanceAction.value === "add") {
+      await driverStore.addBalance(driverId, balanceAmount.value);
+    } else if (balanceAction.value === "remove") {
+      await driverStore.removeBalance(driverId, balanceAmount.value);
+    }
+  } catch (error) {
+    console.error("Balance action error:", error);
+    alert("An error occurred while processing the balance action.");
+  } finally {
+    loadingState.value = { driverId: null, action: "" };
+    closeBalanceModal();
+  }
+};
+</script>
